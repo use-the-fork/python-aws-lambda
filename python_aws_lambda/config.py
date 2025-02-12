@@ -28,6 +28,13 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8000
 DEFAULT_ROOT_PATH = ""
 
+def get_default_database_url():
+    """Determine the default database URL based on the environment."""
+    if os.getenv("ENV") == "production":
+        return os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
+    else:
+        return "sqlite:///./test.db"
+
 @dataclass()
 class RunSettings:
     # Name of the module (python file) used in the run command
@@ -45,37 +52,71 @@ class RunSettings:
 
 @dataclass()
 class DatabaseSettings:
-    transports: Optional[List[str]] = None
-    enable_telemetry: bool = True
-    # List of environment variables to be provided by each user to use the app. If empty, no environment variables will be asked to the user.
-    user_env: Optional[List[str]] = None
-    # Path to the local langchain cache database
-    lc_cache_path: Optional[str] = None
-    # Path to the local chat db
-    # Duration (in seconds) during which the session is saved when the connection is lost
-    session_timeout: int = 3600
-    # Duration (in seconds) of the user session expiry
-    user_session_timeout: int = 1296000  # 15 days
-    # Enable third parties caching (e.g LangChain cache)
-    cache: bool = False
+    db_type: str = "sqlite"  # "sqlite" or "postgresql"
+    db_url: str = Field(default_factory=get_default_database_url)
+    db_user: Optional[str] = None
+    db_password: Optional[str] = None
+    db_host: Optional[str] = None
+    db_port: Optional[int] = None
+    db_name: Optional[str] = None
 
 @dataclass()
 class ProjectConfig:
     root = APP_ROOT
     database: DatabaseSettings
 
+from sqlalchemy import create_engine
+
+def load_database_settings():
+    """Load database settings from the .env file."""
+    db_type = os.getenv("DB_TYPE", "sqlite")
+    db_url = os.getenv("DATABASE_URL", get_default_database_url())
+    db_user = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_host = os.getenv("DB_HOST")
+    db_port = os.getenv("DB_PORT")
+    db_name = os.getenv("DB_NAME")
+
+    # Create the database engine based on the db_type
+    if db_type == "postgresql":
+        engine = create_engine(
+            f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        )
+    else:
+        engine = create_engine(db_url)
+
+    return DatabaseSettings(
+        db_type=db_type,
+        db_url=db_url,
+        db_user=db_user,
+        db_password=db_password,
+        db_host=db_host,
+        db_port=int(db_port) if db_port else None,
+        db_name=db_name,
+    ), engine
+    """Load database settings from the .env file."""
+    db_type = os.getenv("DB_TYPE", "sqlite")
+    db_url = os.getenv("DATABASE_URL", get_default_database_url())
+    db_user = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_host = os.getenv("DB_HOST")
+    db_port = os.getenv("DB_PORT")
+    db_name = os.getenv("DB_NAME")
+
+    return DatabaseSettings(
+        db_type=db_type,
+        db_url=db_url,
+        db_user=db_user,
+        db_password=db_password,
+        db_host=db_host,
+        db_port=int(db_port) if db_port else None,
+        db_name=db_name,
+    )
+
 def load_settings():
-  features_settings = FeaturesSettings(**features_settings)
-
-  ui_settings = UISettings(**ui_settings)
-
-  code_settings = CodeSettings(action_callbacks={})
-
+  database_settings, engine = load_database_settings()
   return {
-    "features": features_settings,
-    "ui": ui_settings,
-    "project": project_settings,
-    "code": code_settings,
+    "database": load_database_settings(),
   }
 
 
@@ -98,7 +139,6 @@ def load_config():
     settings = load_settings()
 
     config = ProjectConfig(
-        chainlit_server=chainlit_server,
         run=RunSettings(),
         **settings,
     )
