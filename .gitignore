@@ -1,0 +1,73 @@
+/public/build
+### Laravel ###
+vendor/*
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/storage
+public_html/hot
+
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+# VSCode specific
+.idea/*
+.vscode/*
+!.vscode/thunder-tests/
+!.vscode/thunder-tests/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+.scripts/
+
+# Built Visual Studio Code Extensions
+*.vsix
+public/js/index.js
+public/mix-manifest.json
+composer.local.json
+packages/*
+
+# Nix & devenv
+result
+.env
+.env.*
+
+!secrets/.env*
+
+.devenv*
+.direnv*
+/.cache
+/.pre-commit-config.yaml
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+.sb*
+secrets.nix
+
+
+# pre-commit
+.pre-commit-config.yaml
+.aider*
