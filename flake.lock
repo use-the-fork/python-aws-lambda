@@ -492,8 +492,8 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1739240822,
-        "narHash": "sha256-iycLc0iDj91n+HzO8CcxqkFN7N6qDJziJsRXz57yARo=",
+        "lastModified": 1739319163,
+        "narHash": "sha256-Y7Z0WuZcULH9qFlPdz3ZS2IZ7b12yySoyX1+OFsvsUo=",
         "path": "/home/sincore/source/snow-blower",
         "type": "path"
       },
